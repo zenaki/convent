@@ -295,13 +295,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.lightBlueAccent,
                                   size: 50),
                               buildCard(
-                                  value: v_BPM,
+                                  value: int.parse(v_BPM) < 10
+                                      ? "0" + v_BPM
+                                      : v_BPM,
                                   label1: "BPM",
                                   label2: "",
                                   color: Colors.lightBlueAccent,
                                   size: 50),
                               buildCard(
-                                  value: v_E_ratio,
+                                  value: "1:" + v_E_ratio,
                                   label1: "E. Ratio",
                                   label2: "",
                                   color: Colors.lightBlueAccent,
@@ -309,7 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               buildCard(
                                   value: v_cmH2O_maks,
                                   label1: "cmH2O",
-                                  label2: "(Max)",
+                                  label2: "(PIP)",
                                   color: Colors.lightBlueAccent,
                                   size: 50),
                               buildCard(
@@ -321,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               buildCard(
                                   value: v_cmH2O_min,
                                   label1: "cmH2O",
-                                  label2: "(Min)",
+                                  label2: "(PEEP)",
                                   color: Colors.lightBlueAccent,
                                   size: 50),
                             ],
