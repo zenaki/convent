@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:core';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import './DiscoveryPage.dart';
 
@@ -53,6 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
+    timer =
+        Timer.periodic(const Duration(milliseconds: 100), _updateDataSource);
+
     // Get current state
     FlutterBluetoothSerial.instance.state.then((state) {
       setState(() {
@@ -79,6 +84,31 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
   }
+
+  Timer timer;
+  List<_ChartData> chartData = <_ChartData>[
+    _ChartData(0, 0),
+    _ChartData(1, 0),
+    _ChartData(2, 0),
+    _ChartData(3, 0),
+    _ChartData(4, 0),
+    _ChartData(5, 0),
+    _ChartData(6, 0),
+    _ChartData(7, 0),
+    _ChartData(8, 0),
+    _ChartData(9, 0),
+    _ChartData(10, 0),
+    _ChartData(11, 0),
+    _ChartData(12, 0),
+    _ChartData(13, 0),
+    _ChartData(14, 0),
+    _ChartData(15, 0),
+    _ChartData(16, 0),
+    _ChartData(17, 0),
+    _ChartData(18, 0),
+  ];
+  int count = 19;
+  ChartSeriesController _chartSeriesController;
 
   Future<void> enableBluetooth() async {
     // Retrieving the current Bluetooth state
@@ -134,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
       connection.dispose();
       connection = null;
     }
-
+    timer?.cancel();
     super.dispose();
   }
 
@@ -208,6 +238,8 @@ class _MyHomePageState extends State<MyHomePage> {
       v_BPM = "0",
       v_E_ratio = "0";
 
+  List<double> traceX = List();
+
   void _onDataReceived(Uint8List data) {
     data.forEach((byte) {
       // print("-----");
@@ -235,6 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
             v_cmH2O_now = val_cmH2O_now;
             v_BPM = val_BPM;
             v_E_ratio = val_E_ratio;
+            traceX.add(double.parse(val_cmH2O_now));
           });
 
           print(
@@ -335,19 +368,39 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Flexible(
               flex: 3,
-              child: Container(color: Colors.white),
+              child: Container(
+                child: SfCartesianChart(
+                  plotAreaBorderWidth: 0,
+                  primaryXAxis: NumericAxis(
+                    majorGridLines: MajorGridLines(
+                      width: 0,
+                    ),
+                  ),
+                  // primaryXAxis: DateTimeAxis(
+                  //   intervalType: DateTimeIntervalType.seconds,
+                  //   interval: 1,
+                  // ),
+                  primaryYAxis: NumericAxis(
+                      axisLine: AxisLine(width: 0),
+                      majorTickLines: MajorTickLines(size: 0)),
+                  series: <SplineSeries<_ChartData, int>>[
+                    SplineSeries<_ChartData, int>(
+                      onRendererCreated: (ChartSeriesController controller) {
+                        _chartSeriesController = controller;
+                      },
+                      dataSource: chartData,
+                      color: const Color.fromRGBO(192, 108, 132, 1),
+                      xValueMapper: (_ChartData data, _) => data.x,
+                      yValueMapper: (_ChartData data, _) => data.y,
+                      animationDuration: 0,
+                    ),
+                  ],
+                ),
+              ),
             ),
             Flexible(flex: 1, child: Container(color: Colors.white)),
           ],
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () {
-        //     _showBluetoothDialog();
-        //   },
-        //   tooltip: 'Bluetooth',
-        //   child: Icon(Icons.bluetooth),
-        // ), // This trailing comma makes auto-formatting nicer for build methods.);
-        // key: _scaffoldKey,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showModalBottomSheet(
@@ -446,28 +499,29 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
-  // var _scaffoldKey = new GlobalKey<ScaffoldState>();
-  // void _showBluetoothDialog() {
-  //   // flutter defined function
-  //   showDialog(
-  //     context: _scaffoldKey.currentContext,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: new Text("Bluetooth"),
-  //         content: new Text("Alert Dialog body"),
-  //         actions: <Widget>[
-  //           // usually buttons at the bottom of the dialog
-  //           new FlatButton(
-  //             child: new Text("Close"),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  ///Continously updating the data source based on timer
+  void _updateDataSource(Timer timer) {
+    // chartData.add(_ChartData(count, _getRandomInt(10, 100)));
+    chartData.add(_ChartData(count, int.parse(v_cmH2O_now)));
+    if (chartData.length == 20) {
+      chartData.removeAt(0);
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[chartData.length - 1],
+        removedDataIndexes: <int>[0],
+      );
+    } else {
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[chartData.length - 1],
+      );
+    }
+    count = count + 1;
+  }
+
+  ///Get the random data
+  num _getRandomInt(num min, num max) {
+    final math.Random _random = math.Random();
+    return min + _random.nextInt(max - min);
+  }
 }
 
 class buildCard extends StatelessWidget {
@@ -521,4 +575,11 @@ class buildCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Private calss for storing the chart series data points.
+class _ChartData {
+  _ChartData(this.x, this.y);
+  final num x;
+  final num y;
 }
