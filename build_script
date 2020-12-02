@@ -1,0 +1,4 @@
+C:\opt\Java\jdk1.8.0_271\bin\keytool.exe -genkey -v -keystore .\convent_v2-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+
+flutter clearn
+flutter build apk
