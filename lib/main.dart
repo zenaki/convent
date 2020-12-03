@@ -3,12 +3,11 @@ import 'dart:typed_data';
 import 'dart:core';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-// import 'package:flutter/services.dart';
-// import 'package:flutter_scan_bluetooth/flutter_scan_bluetooth.dart' as fsBlue;
+import 'package:flutter/services.dart';
+import 'package:flutter_scan_bluetooth/flutter_scan_bluetooth.dart' as fsBlue;
 
 import './DiscoveryPage.dart';
 
@@ -55,9 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // the Bluetooth device connection state
   int _deviceState;
 
-  // String _data = '';
-  // bool _scanning = false;
-  // fsBlue.FlutterScanBluetooth _scanBluetooth = fsBlue.FlutterScanBluetooth();
+  String _data = '';
+  bool _scanning = false;
+  fsBlue.FlutterScanBluetooth _scanBluetooth = fsBlue.FlutterScanBluetooth();
 
   @override
   void initState() {
@@ -92,19 +91,19 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
 
-    // _scanBluetooth.devices.listen((device) {
-    //   print("-------------------------Get Device-------------------------");
-    //   print("Device Name: ${device.name}, Address: ${device.address}");
-    //   setState(() {
-    //     _data += device.name + ' (${device.address})\n';
-    //   });
-    // });
-    // _scanBluetooth.scanStopped.listen((device) {
-    //   setState(() {
-    //     _scanning = false;
-    //     _data += 'scan stopped\n';
-    //   });
-    // });
+    _scanBluetooth.devices.listen((device) {
+      print("-------------------------Get Device-------------------------");
+      print("Device Name: ${device.name}, Address: ${device.address}");
+      setState(() {
+        _data += device.name + ' (${device.address})\n';
+      });
+    });
+    _scanBluetooth.scanStopped.listen((device) {
+      setState(() {
+        _scanning = false;
+        _data += 'scan stopped\n';
+      });
+    });
   }
 
   Timer timer;
