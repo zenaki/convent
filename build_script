@@ -1,4 +1,11 @@
 C:\opt\Java\jdk1.8.0_271\bin\keytool.exe -genkey -v -keystore .\convent_v2-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
 
-flutter clearn
+flutter clean
+
+flutter build appbundle
+
+java -jar .\bundletool-all-1.4.0.jar build-apks --bundle build\app\outputs\bundle\release\app-release.aab --output .\convent_v2.apks
+
+flutter build apk --split-per-abi
+
 flutter build apk

@@ -3,8 +3,12 @@ import 'dart:typed_data';
 import 'dart:core';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+// import 'package:flutter/services.dart';
+// import 'package:flutter_scan_bluetooth/flutter_scan_bluetooth.dart' as fsBlue;
 
 import './DiscoveryPage.dart';
 
@@ -51,6 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
   // the Bluetooth device connection state
   int _deviceState;
 
+  // String _data = '';
+  // bool _scanning = false;
+  // fsBlue.FlutterScanBluetooth _scanBluetooth = fsBlue.FlutterScanBluetooth();
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +91,20 @@ class _MyHomePageState extends State<MyHomePage> {
         getPairedDevices();
       });
     });
+
+    // _scanBluetooth.devices.listen((device) {
+    //   print("-------------------------Get Device-------------------------");
+    //   print("Device Name: ${device.name}, Address: ${device.address}");
+    //   setState(() {
+    //     _data += device.name + ' (${device.address})\n';
+    //   });
+    // });
+    // _scanBluetooth.scanStopped.listen((device) {
+    //   setState(() {
+    //     _scanning = false;
+    //     _data += 'scan stopped\n';
+    //   });
+    // });
   }
 
   Timer timer;
@@ -471,7 +493,28 @@ class _MyHomePageState extends State<MyHomePage> {
                         title: RaisedButton(
                             child: const Text('Explore discovered devices'),
                             onPressed: () async {
-                              final BluetoothDevice selectedDevice =
+                              // try {
+                              //   if (_scanning) {
+                              //     await _scanBluetooth.stopScan();
+                              //     debugPrint("scanning stoped");
+                              //     setState(() {
+                              //       _data = '';
+                              //     });
+                              //   } else {
+                              //     print(
+                              //         "-------------------------Start Scan-------------------------");
+                              //     await _scanBluetooth.startScan(
+                              //         pairedDevices: false);
+                              //     debugPrint("scanning started");
+                              //     setState(() {
+                              //       _scanning = true;
+                              //     });
+                              //   }
+                              // } on PlatformException catch (e) {
+                              //   debugPrint(e.toString());
+                              // }
+
+                              BluetoothDevice selectedDevice =
                                   await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
@@ -479,6 +522,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                   },
                                 ),
                               );
+
+                              // // print("selectedDevice");
+                              // // print(selectedDevice);
+
+                              // // selectedDevice =
+                              // //     BluetoothDevice(address: "98:D3:11:FC:34:A1");
 
                               if (selectedDevice != null) {
                                 print('Discovery -> selected ' +
